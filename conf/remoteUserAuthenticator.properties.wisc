@@ -1,0 +1,42 @@
+# --------------------------------------------------------------------------
+# University of Wisconsin - Madison 
+# Division of Information Technology (DoIT)
+# Shared Tools Team
+# --------------------------------------------------------------------------
+
+create.users=true
+
+update.info=true
+
+default.roles=jira-users
+
+header.fullname = eduWisconsinCommonName
+header.email    = eduWisconsinEmailAddress
+
+default.email.domain = wisc.edu
+
+create.groups = true
+
+update.roles = true
+
+dynamicroles.header.eduWisconsinUDDS = udds1, udds3, udds5, udds7, grp1
+dynamicroles.auto_create_role = true
+dynamicroles.output.tolowercase = true
+dynamicroles.mapper.udds1.match=([A-Z]).*
+dynamicroles.mapper.udds1.transform=udds-$1
+dynamicroles.mapper.udds3.match=([A-Z]\\d\\d).*
+dynamicroles.mapper.udds3.transform=udds-$1
+dynamicroles.mapper.udds5.match=([A-Z]\\d\\d\\d\\d).*
+dynamicroles.mapper.udds5.transform=udds-$1
+dynamicroles.mapper.udds7.match=([A-Z]\\d\\d\\d\\d\\d\\d)
+dynamicroles.mapper.udds7.transform=udds-$1
+dynamicroles.mapper.grp1.match=(a06).*
+dynamicroles.mapper.grp1.transform=doit-employees
+
+purge.roles = udds-.* , doit-employees
+
+# Strip "@wisc.edu" for local logins (i.e. use only the netid), all others retain fully scoped name
+remoteuser=remoteusermap
+remoteuser.map.remoteusermap.match = ^(.*)@wisc.edu$
+remoteuser.map.remoteusermap.casesensitive = false
+remoteuser.map.remoteusermap.transform = $1
