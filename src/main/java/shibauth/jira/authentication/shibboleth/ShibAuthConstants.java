@@ -152,6 +152,11 @@ public class ShibAuthConstants {
     public final static String UPDATE_INFO = "update.info";
 
     /**
+     * update.info.only.if.blank init parameter name
+     */
+    public final static String UPDATE_INFO_ONLY_IF_BLANK = "update.info.only.if.blank";
+
+    /**
      * update.last.login.date init parameter name
      */
     public final static String UPDATE_LAST_LOGIN_DATE = "update.last.login.date";

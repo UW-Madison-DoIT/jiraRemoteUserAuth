@@ -7,6 +7,14 @@ create.users=true
 # Acceptable values: true, false
 update.info=true
 
+# If update.info is set, the default is to update the values in all cases where they are different.
+# If users make local mods to their name or email and don't want those overwritten (but you still
+# want the benefit of update.info being turned on, this flag allows you to tell it to only update
+# the name and email fields when they are blank instead of always. This defaults to false if not
+# present.
+update.info.only.if.blank=true
+
+
 # Whether new and existing accounts should have their last login date and previous login date updated in user properties
 # upon login.
 # Acceptable values: true, false

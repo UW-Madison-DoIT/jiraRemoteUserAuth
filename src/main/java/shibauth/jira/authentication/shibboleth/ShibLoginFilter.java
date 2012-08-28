@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2009, Shibboleth Authenticator for Confluence Team
+ Copyright (c) 2009, Shibboleth Authenticator for Jira Team
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without

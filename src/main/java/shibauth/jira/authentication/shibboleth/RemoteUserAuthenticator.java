@@ -144,6 +144,11 @@ import java.util.regex.*;
  * <li><strong>update.info</strong> - Indicates whether existing accounts
  * should have their name and email address information
  * updated when the user logs in (acceptable values: true/false)</li>
+ * <li><strong>update.info.only.if.blank</strong> - If update.info is false, then
+ * this setting is ignored. If update.info is true then this setting determins if
+ * update.info will only update fields that are blank (when this is set to true) 
+ * or if it will overwrite any value that is different (when this is set to false)
+ * default value is false (acceptable values: true/false)</li>
  * <li><strong>default.roles</strong> - The default roles newly created
  * accounts will be given (format: comma seperated list)</li>
  * <li><strong>purge.roles</strong> - Roles to be purged automatically of users
@@ -453,7 +458,7 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
     }
 
 
-    private void updateUser(Principal user, String fullName, String emailAddress) {
+    private void updateUser(Principal user, String fullName, String emailAddress, boolean onlyIfBlank) {
         // If we have new values for name or email, update the user object
         if (user == null) {
             if (log.isDebugEnabled()) {
@@ -482,26 +487,54 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
             //user.setEmailAddress(email);
 	    //crowdService.updateUser(user);
 
-            if ((fullName != null) && !fullName.equals(crowdUser.getDisplayName())) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Updating user fullName to '" + fullName + "'");
-                }
-
-                userBuilder.displayName(fullName);
-                updated = true;
+	    String currentDisplayName = crowdUser.getDisplayName();
+            if ((fullName != null) && !fullName.equals(currentDisplayName)) {
+		if (onlyIfBlank) { 
+			if (currentDisplayName == null || currentDisplayName.equals("")) {
+                		if (log.isDebugEnabled()) {
+                    			log.debug("Is Blank: Updating user fullName to '" + fullName + "'");
+                		}
+                		userBuilder.displayName(fullName);
+                		updated = true;
+			} else {
+                		if (log.isDebugEnabled()) {
+                    			log.debug("Not Blank: Leaving user fullName '" + currentDisplayName + "'");
+                		}
+			}
+		} else {
+                	if (log.isDebugEnabled()) {
+                    		log.debug("Updating user fullName to '" + fullName + "'");
+                	}
+                	userBuilder.displayName(fullName);
+                	updated = true;
+		}
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("New user fullName is same as old one: '" + fullName + "'");
                 }
             }
 
-            if ((emailAddress != null) && !emailAddress.equals(crowdUser.getEmailAddress())) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Updating user emailAddress to '" + emailAddress + "'");
-                }
-
-                userBuilder.emailAddress(emailAddress);
-                updated = true;
+	    String currentEmailAddress = crowdUser.getEmailAddress();
+            if ((emailAddress != null) && !emailAddress.equals(currentEmailAddress)) {
+		if (onlyIfBlank) { 
+			if (currentEmailAddress == null || currentEmailAddress.equals("")) {
+                		if (log.isDebugEnabled()) {
+                    			log.debug("Is Blank: Updating user emailAddress to '" + emailAddress + "'");
+                		}
+                		userBuilder.emailAddress(emailAddress);
+                		updated = true;
+			} else {
+                		if (log.isDebugEnabled()) {
+                    			log.debug("Not Blank: Leaving user emailAddress '" + currentEmailAddress + "'");
+                		}
+			}
+		} else {
+                	if (log.isDebugEnabled()) {
+                    		log.debug("Updating user emailAddress to '" + emailAddress + "'");
+                	}
+                	userBuilder.emailAddress(emailAddress);
+                	updated = true;
+		}
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("New user emailAddress is same as old one: '" + emailAddress + "'");
@@ -902,7 +935,7 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
 
                 if (null != principal) {
                     // update the first time even if update not set, because we need to set full name and email
-                    updateUser(principal, fullName, emailAddress);
+                    updateUser(principal, fullName, emailAddress, false);
                     newUser = true;
                 } else {
                     // If user is still null, probably we're using an
@@ -918,7 +951,7 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
                 }
             } else {
                 if (config.isUpdateInfo()) {
-                    updateUser(principal, fullName, emailAddress);
+                    updateUser(principal, fullName, emailAddress, config.isUpdateInfoOnlyIfBlank());
                 }
             }
 

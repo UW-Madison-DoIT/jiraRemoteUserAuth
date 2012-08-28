@@ -92,6 +92,13 @@ public class ShibAuthConfigLoader {
                 log.debug("Setting update user information to " + config.isUpdateInfo());
             }
 
+            // Load update.info.only.if.blank property (default to false).
+            config.setUpdateInfoOnlyIfBlank(Boolean.valueOf(configProps.getProperty(ShibAuthConstants.UPDATE_INFO_ONLY_IF_BLANK, "false")).booleanValue());
+
+            if (log.isDebugEnabled()) {
+                log.debug("Setting update user info only if blank to " + config.isUpdateInfoOnlyIfBlank());
+            }
+
             // Load update.lastLoginDate property.
             config.setUpdateLastLogin(
                     Boolean.valueOf(configProps.getProperty(ShibAuthConstants.UPDATE_LAST_LOGIN_DATE, "true")).booleanValue()

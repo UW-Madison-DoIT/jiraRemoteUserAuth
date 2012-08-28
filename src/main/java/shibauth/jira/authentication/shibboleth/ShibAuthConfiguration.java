@@ -140,6 +140,14 @@ public class ShibAuthConfiguration {
     private boolean updateInfo;
 
     /**
+     * If updateInfo true, then this shows whether or not to update name/email only if they
+     * are blank or to do it persistently regardless of current value.
+     * This allows you to still take advantage of the updateInfo but to not overwrite any
+     * local mods to the name and email.
+     */
+    private boolean updateInfoOnlyIfBlank;
+
+    /**
      * Whether to update roles for new users or not
      */
     private boolean updateRoles;
@@ -377,6 +385,14 @@ public class ShibAuthConfiguration {
 
     public void setUpdateInfo(boolean updateInfo) {
         this.updateInfo = updateInfo;
+    }
+
+    public boolean isUpdateInfoOnlyIfBlank() {
+        return updateInfoOnlyIfBlank;
+    }
+
+    public void setUpdateInfoOnlyIfBlank(boolean updateInfoOnlyIfBlank) {
+        this.updateInfoOnlyIfBlank = updateInfoOnlyIfBlank;
     }
 
     public boolean isUpdateRoles() {
