@@ -33,20 +33,20 @@ Shibboleth Deployment
 
    -----------------
 
-  <param-name>login.url</param-name>
-  <param-value>https://SERVER/Shibboleth.sso/XXX?target=/jira/secure/Dashboard.jspa?os_destination=${originalurl}</param-value>
-
-  <param-name>link.login.url</param-name>
-  <param-value>https://SERVER/Shibboleth.sso/XXX?target=/jira/secure/Dashboard.jspa?os_destination=${originalurl}</param-value>
-
-  <param-name>link.logout.url</param-name>
-  <param-value>https://SERVER/Shibboleth.sso/Logout?return=/jira/secure/Logout!default.jspa</param-value>
-
-  <param-name>logout.url</param-name>
-  <param-value>https://SERVER/Shibboleth.sso/Logout?return=/jira/secure/Logout!default.jspa</param-value>
-
-  &lt;!--  <authenticator class="com.atlassian.seraph.auth.DefaultAuthenticator"/> --&gt;
-  <authenticator class="shibauth.jira.authentication.shibboleth.RemoteUserAuthenticator"/>
+    <param-name>login.url</param-name>
+    <param-value>https://SERVER/Shibboleth.sso/XXX?target=/jira/secure/Dashboard.jspa?os_destination=${originalurl}</param-value>
+    
+    <param-name>link.login.url</param-name>
+    <param-value>https://SERVER/Shibboleth.sso/XXX?target=/jira/secure/Dashboard.jspa?os_destination=${originalurl}</param-value>
+    
+    <param-name>link.logout.url</param-name>
+    <param-value>https://SERVER/Shibboleth.sso/Logout?return=/jira/secure/Logout!default.jspa</param-value>
+    
+    <param-name>logout.url</param-name>
+    <param-value>https://SERVER/Shibboleth.sso/Logout?return=/jira/secure/Logout!default.jspa</param-value>
+    
+    <!--  <authenticator class="com.atlassian.seraph.auth.DefaultAuthenticator"/> -->
+    <authenticator class="shibauth.jira.authentication.shibboleth.RemoteUserAuthenticator"/>
 
    -----------------
 
