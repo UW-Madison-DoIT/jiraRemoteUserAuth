@@ -1,5 +1,5 @@
 README for Shibboleth Authenticator for Jira 5.x
-========================================================
+================================================
 
 Main page at:
 https://github.com/UW-Madison-DoIT/jiraRemoteUserAuth
@@ -9,7 +9,7 @@ https://studio.plugins.atlassian.com/wiki/display/SHBL/Confluence+Shibboleth+Aut
 
 
 Compilation (using Atlassian Plugin SDK)
-==================================================
+========================================
 
 run "atlas-clean", then "atlas-compile", then "atlas-package"
 
