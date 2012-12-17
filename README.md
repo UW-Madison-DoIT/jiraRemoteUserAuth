@@ -45,12 +45,13 @@ Shibboleth Deployment
   <param-name>logout.url</param-name>
   <param-value>https://SERVER/Shibboleth.sso/Logout?return=/jira/secure/Logout!default.jspa</param-value>
 
-  <!--  <authenticator class="com.atlassian.seraph.auth.DefaultAuthenticator"/> -->
+  &lt;!--  <authenticator class="com.atlassian.seraph.auth.DefaultAuthenticator"/> --&gt;
   <authenticator class="shibauth.jira.authentication.shibboleth.RemoteUserAuthenticator"/>
 
    -----------------
 
 4) configure your SP AAP.xml or attribute-map.xml by mapping appropriate headers (pay attention to step #2).
+   
    Most likely headers you need: 
    * REMOTE_USER
    * FULL_NAME
@@ -58,6 +59,7 @@ Shibboleth Deployment
    * whatever dynamic roles' headers
 
 5) modification on apache's configuration
+  
   a) configure mod_proxy_ajp
 
     ProxyPass /jira ajp://localhost:8009/jira
@@ -75,7 +77,7 @@ Shibboleth Deployment
         require shibboleth
      </Location>
 
-     or regular session
+   or regular session
 
      <Location /jira>
         AuthType shibboleth
