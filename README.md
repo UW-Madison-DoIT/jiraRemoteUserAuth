@@ -45,7 +45,7 @@ Shibboleth Deployment
     <param-name>logout.url</param-name>
     <param-value>https://SERVER/Shibboleth.sso/Logout?return=/jira/secure/Logout!default.jspa</param-value>
     
-    <!--  <authenticator class="com.atlassian.seraph.auth.DefaultAuthenticator"/> -->
+    <!-- <authenticator class="com.atlassian.seraph.auth.DefaultAuthenticator"/> -->
     <authenticator class="shibauth.jira.authentication.shibboleth.RemoteUserAuthenticator"/>
 
    -----------------
