@@ -77,9 +77,13 @@ import com.atlassian.jira.exception.PermissionException;
 import com.atlassian.jira.exception.RemoveException;
 import com.atlassian.jira.exception.AddException;
 
+import com.atlassian.jira.config.properties.ApplicationProperties;
+
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.groups.DefaultGroupManager;
 import com.atlassian.jira.security.login.LoginManager;
+import com.atlassian.jira.security.login.LoginStore;
+import com.atlassian.jira.security.login.LoginStoreImpl;
 import com.atlassian.jira.security.login.JiraSeraphAuthenticator;
 
 import com.atlassian.crowd.embedded.api.CrowdService;
@@ -807,31 +811,37 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
 
 
 
-
-
     private void loginSuccessful(HttpServletRequest request, HttpServletResponse response, String username, Principal user, String remoteHost, String remoteIP) {
         if (log.isDebugEnabled()) {
             log.debug("Logging in user " + user.getName() + ". request=" + request + ", response=" + response + ", username=" + username + ", user=" + user + ", user.getName=" + user.getName() + ", remoteHost=" + remoteHost + ", remoteIP="+ remoteIP);
         }
 
+	//
         // SHBL-50 - code provided by Joseph Clark and Erkki Aalto to do postlogin updates.
         //           Some of this will break eventually with new Confluence/Crowd versions.
+        //
         putPrincipalInSessionContext(request, user);
-        // TODO: Joe Clark uses getElevatedSecurityGuard() vs. getLoginManager(). Which should we use?
-        // see: https://bitbucket.org/jaysee00/example-confluence-sso-authenticator/src/381eb95ebc08/src/main/java/com/atlassian/confluence/seraph/example/ExampleSSOAuthenticator.java
-	//getLoginManager().onSuccessfulLoginAttempt(username, request);
-	//getEventPublisher().publish(new LoginEvent(this, username, request.getSession().getId(), remoteHost, remoteIP));
-	//LoginReason.OK.stampRequestResponse(request, response);
+
+	//
+	// Recording of Last Login Time
+	//
+	ApplicationProperties appProp = ComponentAccessor.getApplicationProperties();
+	LoginStoreImpl loginStore = new LoginStoreImpl(appProp);
+	CrowdService crowdService = getCrowdService();
+        User crowdUser = crowdService.getUser(user.getName());
+	loginStore.recordLoginAttempt(crowdUser, true);
     }
+
+
+
 
     private void loginFailed(HttpServletRequest request, String username, String remoteHost, String remoteIP, String reason) {
         if (log.isDebugEnabled()) {
             log.debug("Login failed for user " + username + ". request=" + request + ", username=" + username + ", remoteHost=" + remoteHost + ", remoteIP="+ remoteIP + ", reason=" + reason);
         }
-
-        //getLoginManager().onFailedLoginAttempt(username, request);
-        //getEventPublisher().publish(new LoginFailedEvent(this, reason, request.getSession().getId(), remoteHost, remoteIP));
     }
+
+
 
     private void updateGroupMemberships(HttpServletRequest request, Principal principal, CrowdService crowdService) {
 	User crowdUser = (User)principal;

@@ -1,8 +1,8 @@
-#!/usr/bin/ksh
+#!/bin/ksh
 
-if [ -f /jira/scripts/bash_profile ]; then
-       . /jira/scripts/bash_profile
-fi
+#if [ -f /jira/scripts/bash_profile ]; then
+#       . /jira/scripts/bash_profile
+#fi
 
 atlas-clean
 
