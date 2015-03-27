@@ -822,14 +822,19 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
         //
         putPrincipalInSessionContext(request, user);
 
-	//
-	// Recording of Last Login Time
-	//
-	ApplicationProperties appProp = ComponentAccessor.getApplicationProperties();
-	LoginStoreImpl loginStore = new LoginStoreImpl(appProp);
-	CrowdService crowdService = getCrowdService();
-        User crowdUser = crowdService.getUser(user.getName());
-	loginStore.recordLoginAttempt(crowdUser, true);
+	if (config.isUpdateLastLogin()) {
+		//
+		// Recording of Last Login Time
+		//
+        	if (log.isInfoEnabled()) {
+			log.info("Updating Last Login Time for " + user.getName());
+		}
+		ApplicationProperties appProp = ComponentAccessor.getApplicationProperties();
+		LoginStoreImpl loginStore = new LoginStoreImpl(appProp);
+		CrowdService crowdService = getCrowdService();
+        	User crowdUser = crowdService.getUser(user.getName());
+		loginStore.recordLoginAttempt(crowdUser, true);
+	}
     }
 
 
