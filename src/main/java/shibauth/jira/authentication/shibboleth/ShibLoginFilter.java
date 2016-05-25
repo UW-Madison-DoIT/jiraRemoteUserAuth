@@ -31,7 +31,7 @@
  * Created 2009-01-22 to make sure the authenticator is performing efficient login flow [MELCOE]
  */
 
-package shibauth.jira.authentication.shibboleth;
+package JiraRemoteUserAuth;
 
 import com.atlassian.seraph.auth.AuthenticatorException;
 import com.atlassian.seraph.filter.BaseLoginFilter;

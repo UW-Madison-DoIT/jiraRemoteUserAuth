@@ -1,4 +1,4 @@
-README for Shibboleth Authenticator for Jira 5.x
+README for Shibboleth Authenticator for Jira 7.x
 ================================================
 
 Main page at:

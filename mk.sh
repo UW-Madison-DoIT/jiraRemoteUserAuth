@@ -8,4 +8,8 @@ clear
 
 atlas-clean
 
-atlas-compile
+#atlas-compile
+
+#atlas-compile -Dmaven.compiler.showWarnings=true
+
+atlas-compile -Dmaven.compiler.showDeprecation=true

@@ -60,6 +60,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,6 +86,8 @@ import com.atlassian.jira.security.login.LoginManager;
 import com.atlassian.jira.security.login.LoginStore;
 import com.atlassian.jira.security.login.LoginStoreImpl;
 import com.atlassian.jira.security.login.JiraSeraphAuthenticator;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.ApplicationUsers;
 
 import com.atlassian.crowd.embedded.api.CrowdService;
 import com.atlassian.crowd.embedded.api.Group;
@@ -118,6 +121,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -127,6 +131,43 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.LinkedList;
 import java.util.regex.*;
+
+
+/*
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.ApplicationProperties;
+import edu.wisc.jiraRemoteUserAuth.api.MyPluginComponent;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+@ExportAsService ({MyPluginComponent.class})
+@Named ("myPluginComponent")
+public class MyPluginComponentImpl implements MyPluginComponent
+{
+    @ComponentImport
+    private final ApplicationProperties applicationProperties;
+
+    @Inject
+    public MyPluginComponentImpl(final ApplicationProperties applicationProperties)
+    {
+        this.applicationProperties = applicationProperties;
+    }
+
+    public String getName()
+    {
+        if(null != applicationProperties)
+        {
+            return "myComponent:" + applicationProperties.getDisplayName();
+        }
+
+        return "myComponent";
+    }
+}
+*/
+
+
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -210,6 +251,7 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
 
     private final static Log log = LogFactory.getLog(RemoteUserAuthenticator.class);
     private static ShibAuthConfiguration config;
+    private SecureRandom prng = new SecureRandom();
 
     // Initialize properties from property file
     static {
@@ -384,12 +426,14 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
             }
 
             User crowdUser = crowdService.getUser(user.getName());
+            ApplicationUser applicationUser = ApplicationUsers.from(crowdUser);
             Collection purgeMappers = config.getPurgeMappings();
 
-            List<String> roles = (List<String>)groupManager.getGroupNamesForUser(user.getName());
+            Collection<String> roles = groupManager.getGroupNamesForUser(applicationUser);
+            Iterator<String> i = roles.iterator();
+            while (i.hasNext()) {
+                String role = i.next();
 
-            for (int i = 0; i < roles.size(); i++) {
-                String role = roles.get(i);
                 if (!StringUtil.containsStringIgnoreCase(rolesToKeep, role)) {
                     //run through the purgeMappers for this role
                     for (Iterator it2 = purgeMappers.iterator(); it2.hasNext(); ) {
@@ -448,16 +492,15 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
             log.info("Creating User Account: userid:" + username + " displayName:" + displayName + " emailAddress:" + emailAddress);
         }
 
-	// Give this user a random password
-	String pw = RandomPasswordGenerator.getPassword();
-
+	//
+	// todo:
+	// https://developer.atlassian.com/jiradev/latest-updates/preparing-for-jira-7-0/jira-7-0-api-changes?_ga=1.7377844.74947118.1431536469#JIRA7.0-APIchanges-ApiApplicationUser
+	// Use new UserService method to create users
+	//
         try {
-            UserUtil uu = ComponentManager.getComponentInstanceOfType(UserUtil.class);
-	    uu.createUserNoNotification(username, pw, emailAddress, displayName);
-        } catch (CreateException e) {
-	    log.warn(e.toString() );
-        } catch (PermissionException e) {
-	    log.warn(e.toString() );
+            createUser(getCrowdService(), username, displayName, emailAddress);
+        } catch (Throwable t) {
+            log.warn("Error creating user " + username + ". Will ignore and try to get the user (maybe it was already created)", t);
         }
     }
 
@@ -829,11 +872,15 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
         	if (log.isInfoEnabled()) {
 			log.info("Updating Last Login Time for " + user.getName());
 		}
+
 		ApplicationProperties appProp = ComponentAccessor.getApplicationProperties();
-		LoginStoreImpl loginStore = new LoginStoreImpl(appProp);
 		CrowdService crowdService = getCrowdService();
+                AuthClock aclock = new AuthClock();
+		LoginStoreImpl loginStore = new LoginStoreImpl(aclock, appProp,crowdService);
         	User crowdUser = crowdService.getUser(user.getName());
-		loginStore.recordLoginAttempt(crowdUser, true);
+                ApplicationUser applicationUser = ApplicationUsers.from(crowdUser);
+		loginStore.recordLoginAttempt(applicationUser, true);
+
 	}
     }
 
@@ -1164,6 +1211,28 @@ public class RemoteUserAuthenticator extends JiraSeraphAuthenticator {
         return results;
     }
 
+    // avoid "Write operations are not allowed in read-only mode" per Joseph Clark of Atlassian in
+    // https://answers.atlassian.com/questions/25160/crowdservice-updateuser-causes-write-operations-are-not-allowed-in-read-only-mode
+    // https://developer.atlassian.com/display/CONFDEV/Hibernate+Sessions+and+Transaction+Management+Guidelines
+    private void createUser(final CrowdService crowdService, final String username, final String fullName, final String email) {
+        if (username != null) {
+            try {
+                byte[] randomPass = new byte[16];
+                prng.nextBytes(randomPass);
+                ImmutableUser.Builder userBuilder = new ImmutableUser.Builder();
+                userBuilder.active(true);
+                userBuilder.directoryId(0);
+                userBuilder.displayName(fullName);
+                userBuilder.emailAddress(email);
+                userBuilder.name(username);
+                crowdService.addUser(userBuilder.toUser(), Base64.encodeBase64String(randomPass));
+            } catch (Throwable t) {
+                log.error("Failed to create user '" + username + "'!", t);
+            }
+        } else {
+            log.warn("Cannot add user with null username!");
+        }
+    }
 
     /**
      * Get a fresh version of the Crowd Read Write service from Pico Container.
