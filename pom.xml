@@ -5,7 +5,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>JiraRemoteUserAuth</groupId>
+    <groupId>shibauth.jira.authentication.shibboleth</groupId>
     <artifactId>jiraRemoteUserAuth</artifactId>
     <version>1.0.5</version>
 
@@ -16,7 +16,7 @@
 
 
     <name>jiraRemoteUserAuth</name>
-    <description>This is the JiraRemoteUserAuth:jiraRemoteUserAuth plugin for Atlassian JIRA.</description>
+    <description>This is the shibauth.jira.authentication.shibboleth.jiraRemoteUserAuth plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
     <repositories>
         <repository>
@@ -124,7 +124,7 @@
 
                         <!-- Add package to export here -->
                         <Export-Package>
-                            JiraRemoteUserAuth,
+                            shibauth.jira.authentication.shibboleth,
                         </Export-Package>
 
                         <!-- Add package import here -->
