@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>shibauth.jira.authentication.shibboleth</groupId>
     <artifactId>jiraRemoteUserAuth</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 
     <organization>
         <name>University of Wisconsin - Madison</name>
@@ -70,13 +70,7 @@
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
             <version>${atlassian.spring.scanner.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-runtime</artifactId>
-            <version>${atlassian.spring.scanner.version}</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -143,7 +137,7 @@
             <plugin>
                 <groupId>com.atlassian.plugin</groupId>
                 <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
-                <version>1.2.6</version>
+                <version>${atlassian.spring.scanner.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -153,12 +147,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scannedDependencies>
-                        <dependency>
-                            <groupId>com.atlassian.plugin</groupId>
-                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
-                        </dependency>
-                    </scannedDependencies>
                     <verbose>false</verbose>
                 </configuration>
             </plugin>
@@ -166,7 +154,7 @@
     </build>
 
     <properties>
-        <jira.version>7.1.4</jira.version>
+        <jira.version>7.2.3</jira.version>
         <amps.version>6.2.4</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.6</atlassian.spring.scanner.version>
